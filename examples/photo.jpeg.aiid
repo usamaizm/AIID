@@ -1,0 +1,12 @@
+{
+  "aiid_version": "0.1",
+  "identity": {
+    "id": "urn:uuid:00000000-0000-4000-8000-000000000001",
+    "type": "image"
+  },
+  "resource": {
+    "name": "photo.jpeg",
+    "media_type": "image/jpeg"
+  },
+  "description": "Illustrative photograph descriptor. Replace the sample identifier and description with real values."
+}
