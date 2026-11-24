@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/aiid/schema/0.1",
+  "$id": "https://github.com/usamaizm/AIID/blob/main/schema/aiid-0.1.schema.json",
   "title": "AIID Descriptor 0.1",
-  "description": "Provisional JSON Schema for AIID draft 0.1. The $id is a placeholder, not a registered schema URL.",
+  "description": "Provisional JSON Schema for AIID draft 0.1. The $id identifies the versioned schema published in this repository.",
   "type": "object",
   "required": [
     "aiid_version",
