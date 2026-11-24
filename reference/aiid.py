@@ -7,7 +7,7 @@ verify signatures, execute resources, or implement a full JSON Schema engine.
 from __future__ import annotations
 
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Any
 
 
@@ -71,7 +71,13 @@ def resolve_local_resource(descriptor_path: str | Path, descriptor: dict[str, An
     name = resource.get("name")
     if not isinstance(name, str) or not name:
         raise AIIDError("resource.name is required for local resolution")
-    candidate = (descriptor_file.parent / name).resolve()
+    relative_name = Path(name)
+    windows_name = PureWindowsPath(name)
+    if relative_name.is_absolute() or windows_name.is_absolute():
+        raise AIIDError("resource.name must be a relative path")
+    if ".." in relative_name.parts or ".." in windows_name.parts:
+        raise AIIDError("resource.name must not contain parent-directory traversal")
+    candidate = (descriptor_file.parent / relative_name).resolve()
     try:
         candidate.relative_to(descriptor_file.parent)
     except ValueError as exc:
