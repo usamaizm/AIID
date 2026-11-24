@@ -35,6 +35,22 @@ class AIIDTests(unittest.TestCase):
         with self.assertRaises(AIIDError):
             validate_descriptor({"aiid_version": "0.1", "identity": {"id": "", "type": "image"}})
 
+    def test_rejects_whitespace_identity_fields(self):
+        with self.assertRaises(AIIDError):
+            validate_descriptor({
+                "aiid_version": "0.1",
+                "identity": {"id": "   ", "type": "image"},
+            })
+
+    def test_rejects_blank_optional_resource_fields(self):
+        for field in ("name", "uri", "media_type"):
+            with self.subTest(field=field):
+                with self.assertRaises(AIIDError):
+                    validate_descriptor({
+                        **VALID,
+                        "resource": {field: "   "},
+                    })
+
     def test_companion_suffix(self):
         self.assertEqual(companion_path("photo.jpeg"), Path("photo.jpeg.aiid"))
 
