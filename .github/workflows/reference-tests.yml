@@ -13,6 +13,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Validate schema and example JSON syntax
+        run: |
+          python -m json.tool schema/aiid-0.1.schema.json > /dev/null
+          python -m json.tool examples/photo.jpeg.aiid > /dev/null
+          python -m json.tool examples/research.aidb.aiid > /dev/null
       - name: Run standard-library tests
         working-directory: reference
         run: python -m unittest -v
