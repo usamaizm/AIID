@@ -57,3 +57,7 @@ AIID and AIDB have distinct responsibilities. An AIDB file is a data container. 
 ## License
 
 Project materials are provided under the Apache License, Version 2.0. See LICENSE.
+
+## Reference implementation
+
+A minimal Python standard-library helper and unit tests are available in [reference/](reference/README.md). They cover draft 0.1 structural validation, UTF-8 JSON loading, companion filename construction, and safe local path resolution. They are illustrative reference code, not a complete conformance or security implementation.
