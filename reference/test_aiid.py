@@ -76,6 +76,24 @@ class AIIDTests(unittest.TestCase):
                     **VALID, "resource": {"name": str(Path(directory) / "photo.jpeg")}
                 })
 
+    def test_rejects_windows_absolute_resource_path(self):
+        with tempfile.TemporaryDirectory() as directory:
+            descriptor_path = Path(directory) / "photo.jpeg.aiid"
+            for name in (r"C:\\Users\\Public\\photo.jpeg", r"\\\\server\\share\\photo.jpeg"):
+                with self.subTest(name=name):
+                    with self.assertRaises(AIIDError):
+                        resolve_local_resource(descriptor_path, {
+                            **VALID, "resource": {"name": name}
+                        })
+
+    def test_rejects_windows_parent_traversal(self):
+        with tempfile.TemporaryDirectory() as directory:
+            descriptor_path = Path(directory) / "photo.jpeg.aiid"
+            with self.assertRaises(AIIDError):
+                resolve_local_resource(descriptor_path, {
+                    **VALID, "resource": {"name": r"folder\\..\\outside.jpeg"}
+                })
+
     def test_resolves_local_resource(self):
         with tempfile.TemporaryDirectory() as directory:
             descriptor_path = Path(directory) / "photo.jpeg.aiid"
