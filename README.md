@@ -61,3 +61,8 @@ Project materials are provided under the Apache License, Version 2.0. See LICENS
 ## Reference implementation
 
 A minimal Python standard-library helper and unit tests are available in [reference/](reference/README.md). They cover draft 0.1 structural validation, UTF-8 JSON loading, companion filename construction, and safe local path resolution. They are illustrative reference code, not a complete conformance or security implementation.
+
+
+## Ecosystem integration
+
+This project is part of a set of independent, interoperable open projects. See the [ecosystem integration contract](https://github.com/usamaizm/AIDB/blob/main/docs/ECOSYSTEM_INTEGRATION.md) for its role, interoperability boundaries, and integration principles.
