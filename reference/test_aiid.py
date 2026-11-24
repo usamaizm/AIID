@@ -52,6 +52,14 @@ class AIIDTests(unittest.TestCase):
                     **VALID, "resource": {"name": "../outside.jpeg"}
                 })
 
+    def test_rejects_absolute_resource_path(self):
+        with tempfile.TemporaryDirectory() as directory:
+            descriptor_path = Path(directory) / "photo.jpeg.aiid"
+            with self.assertRaises(AIIDError):
+                resolve_local_resource(descriptor_path, {
+                    **VALID, "resource": {"name": str(Path(directory) / "photo.jpeg")}
+                })
+
     def test_resolves_local_resource(self):
         with tempfile.TemporaryDirectory() as directory:
             descriptor_path = Path(directory) / "photo.jpeg.aiid"
