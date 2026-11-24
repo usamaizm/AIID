@@ -1,8 +1,11 @@
 """Small standard-library reference helpers for AIID draft 0.1.
 
-This module validates the required structural fields and resolves a descriptor's
-local companion resource conservatively. It does not authenticate descriptors,
-verify signatures, execute resources, or implement a full JSON Schema engine.
+This module validates descriptors against the structural and type rules in
+``schema/aiid-0.1.schema.json`` for every field that schema constrains, with
+one disclosed exception: ``resource.uri`` is checked only as a string, not
+for ``format: uri`` semantics. It resolves a descriptor's local companion
+resource conservatively. It does not authenticate descriptors, verify
+signatures, execute resources, or implement a full JSON Schema engine.
 """
 from __future__ import annotations
 
@@ -15,8 +18,22 @@ class AIIDError(ValueError):
     """Raised when an AIID descriptor is malformed or unsafe to resolve."""
 
 
+def _require_non_empty_string(container: dict[str, Any], field: str, label: str) -> None:
+    item = container.get(field)
+    if not isinstance(item, str) or len(item) < 1:
+        raise AIIDError(f"{label} must be a non-empty string")
+
+
 def validate_descriptor(value: Any) -> dict[str, Any]:
-    """Validate the mandatory AIID 0.1 structural contract."""
+    """Validate the AIID 0.1 contract in ``schema/aiid-0.1.schema.json``.
+
+    The verdicts match the schema for every field it constrains, except
+    ``format: uri`` on ``resource.uri``, which is checked only as a string.
+    Unknown fields and unknown identity type labels are tolerated, as the
+    schema and SPEC require. A whitespace-only string satisfies the
+    schema's ``minLength: 1`` and is therefore accepted: neither the schema
+    nor SPEC section 5 defines a trimming rule for identity fields.
+    """
     if not isinstance(value, dict):
         raise AIIDError("descriptor must be a JSON object")
     if value.get("aiid_version") != "0.1":
@@ -25,16 +42,31 @@ def validate_descriptor(value: Any) -> dict[str, Any]:
     if not isinstance(identity, dict):
         raise AIIDError("identity must be an object")
     for field in ("id", "type"):
-        if not isinstance(identity.get(field), str) or not identity[field].strip():
-            raise AIIDError(f"identity.{field} must be a non-empty string")
-    resource = value.get("resource")
-    if resource is not None and not isinstance(resource, dict):
-        raise AIIDError("resource must be an object when present")
-    if isinstance(resource, dict):
-        for field in ("name", "uri", "media_type"):
-            item = resource.get(field)
-            if item is not None and not isinstance(item, str):
-                raise AIIDError(f"resource.{field} must be a string")
+        _require_non_empty_string(identity, field, f"identity.{field}")
+    for field in ("version", "scheme"):
+        if field in identity:
+            _require_non_empty_string(identity, field, f"identity.{field}")
+    if "resource" in value:
+        resource = value["resource"]
+        if not isinstance(resource, dict):
+            raise AIIDError("resource must be an object when present")
+        for field in ("name", "media_type"):
+            if field in resource:
+                _require_non_empty_string(resource, field, f"resource.{field}")
+        if "uri" in resource and not isinstance(resource["uri"], str):
+            raise AIIDError("resource.uri must be a string")
+    if "description" in value and not isinstance(value["description"], str):
+        raise AIIDError("description must be a string")
+    for field in ("metadata", "provenance", "integrity"):
+        if field in value and not isinstance(value[field], dict):
+            raise AIIDError(f"{field} must be an object when present")
+    if "links" in value:
+        links = value["links"]
+        if not isinstance(links, list):
+            raise AIIDError("links must be an array when present")
+        for item in links:
+            if not isinstance(item, dict):
+                raise AIIDError("links items must be objects")
     return value
 
 
