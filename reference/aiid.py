@@ -35,6 +35,8 @@ def validate_descriptor(value: Any) -> dict[str, Any]:
             item = resource.get(field)
             if item is not None and not isinstance(item, str):
                 raise AIIDError(f"resource.{field} must be a string")
+            if item is not None and not item.strip():
+                raise AIIDError(f"resource.{field} must not be empty")
     return value
 
 
