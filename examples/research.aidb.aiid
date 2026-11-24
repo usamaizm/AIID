@@ -1,0 +1,12 @@
+{
+  "aiid_version": "0.1",
+  "identity": {
+    "id": "urn:uuid:00000000-0000-4000-8000-000000000002",
+    "type": "aidb-container"
+  },
+  "resource": {
+    "name": "research.aidb",
+    "media_type": "application/octet-stream"
+  },
+  "description": "Illustrative descriptor for an AIDB container. AIID describes the container; it does not define or duplicate its internal payload."
+}
