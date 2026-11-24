@@ -14,6 +14,12 @@ VALID = {
 
 
 class AIIDTests(unittest.TestCase):
+    def test_repository_examples(self):
+        examples = Path(__file__).resolve().parents[1] / "examples"
+        for path in examples.glob("*.aiid"):
+            with self.subTest(example=path.name):
+                self.assertEqual(load_descriptor(path), json.loads(path.read_text(encoding="utf-8")))
+
     def test_valid_descriptor(self):
         self.assertEqual(validate_descriptor(VALID), VALID)
 
