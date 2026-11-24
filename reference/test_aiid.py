@@ -94,6 +94,21 @@ class AIIDTests(unittest.TestCase):
                     **VALID, "resource": {"name": r"folder\\..\\outside.jpeg"}
                 })
 
+    def test_rejects_symlink_escape(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            descriptor_dir = root / "descriptors"
+            outside_dir = root / "outside"
+            descriptor_dir.mkdir()
+            outside_dir.mkdir()
+            (outside_dir / "secret.txt").write_text("not for this descriptor", encoding="utf-8")
+            (descriptor_dir / "linked").symlink_to(outside_dir, target_is_directory=True)
+            descriptor_path = descriptor_dir / "resource.aiid"
+            with self.assertRaises(AIIDError):
+                resolve_local_resource(descriptor_path, {
+                    **VALID, "resource": {"name": "linked/secret.txt"}
+                })
+
     def test_resolves_local_resource(self):
         with tempfile.TemporaryDirectory() as directory:
             descriptor_path = Path(directory) / "photo.jpeg.aiid"
